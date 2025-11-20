@@ -1,6 +1,6 @@
 ﻿<ModMetaData>
     <name>Easy Speedup DX</name>
-    <author>fyarn and ch1kulya</author>
+    <author>ch1kulya</author>
     <packageId>ch1kulya.EasySpeedup</packageId>
     <description>Simple-to-activate 4x speed with GUI icon or keyboard key '4'. No dev mode required!</description>
     <supportedVersions>
