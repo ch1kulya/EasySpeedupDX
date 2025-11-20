@@ -1,7 +1,10 @@
 <div align="center">
    
 ## EasySpeedupDX
-Simple-to-activate 4x speed with GUI icon or keyboard key '4'. No dev mode required! The [original mod](https://github.com/fyarn/EasySpeedup) was abandoned so I made this fork.
+Simple-to-activate 4x speed with GUI icon or keyboard key '4'. No dev mode required!
+
+The [original mod](https://github.com/fyarn/EasySpeedup) was abandoned so I made this fork.
+
 </div>
 
 ### Known Bugs/Limitations/Requirements:
@@ -10,7 +13,7 @@ None.
 ### Download
 - Github (with Source): https://github.com/ch1kulya/EasySpeedupDX
 - Direct: https://github.com/ch1kulya/EasySpeedupDX/archive/master.zip
-- Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=1132557840
+- Steam: [https://steamcommunity.com/sharedfiles/filedetails/?id=1132557840](https://steamcommunity.com/sharedfiles/filedetails/?id=3609256117)
 
 ### How to install (non-Steam users):
 - Unzip the contents and place them in your RimWorld/Mods folder.
