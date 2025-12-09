@@ -15,41 +15,45 @@ namespace EasySpeedup
         {
             var harmony = new Harmony("EasySpeedup");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
-            ((Texture2D[]) typeof(Thing).Assembly.GetType("Verse.TexButton").GetField(nameof(TexButton.SpeedButtonTextures)).GetValue(null))[4] =
+
+            ((Texture2D[])typeof(Thing).Assembly.GetType("Verse.TexButton").GetField(nameof(TexButton.SpeedButtonTextures)).GetValue(null))[4] =
                 ContentFinder<Texture2D>.Get("UI/TimeControls/TimeSpeedButton_Ultrafast", true);
         }
     }
 
-
-    [HarmonyPatch(typeof(TimeControls), nameof(TimeControls.DoTimeControlsGUI))] // Target class for patching, generally required.
+    [HarmonyPatch(typeof(TimeControls), nameof(TimeControls.DoTimeControlsGUI))]
     public static class TimeControlsPatch
     {
         private static readonly MethodInfo devGetter = AccessTools.Property(typeof(Prefs), nameof(Prefs.DevMode)).GetGetMethod();
-        private static readonly MethodInfo drawLine = AccessTools.Method(typeof(Widgets), nameof(Widgets.DrawLineHorizontal));
-        // stops checks for devmode enabled and draws/activates 4x speed mode
+        private static readonly MethodInfo drawLine = AccessTools.Method(typeof(Widgets), nameof(Widgets.DrawLineHorizontal), new System.Type[] { typeof(float), typeof(float), typeof(float) });
+
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            // replace codeinstructions in order
             var list = new List<CodeInstruction>(instructions);
             var buttonDrawn = false;
             var lineWidthFixed = false;
             var devModeEnabled = false;
 
-            for (var i = 0; i < list.Count; i++) {
+            for (var i = 0; i < list.Count; i++)
+            {
                 var code = list[i];
 
-            for (int i = 0; i < list.Count; i++) {
-                // find opcode before the check for the 5th speed option (ultra), skips conditional
-                if (!buttonDrawn && code.opcode == OpCodes.Ldloc_3) {
+                if (!buttonDrawn && code.opcode == OpCodes.Ldloc_3)
+                {
                     i += 3;
                     buttonDrawn = true;
-                    yield return new CodeInstruction(list[i]);
+                    if (i < list.Count)
+                    {
+                        yield return new CodeInstruction(list[i]);
+                    }
                     continue;
                 }
 
-                if (!lineWidthFixed && code.LoadsConstant(2d) && (i + 2) < list.Count) {
+                if (!lineWidthFixed && code.LoadsConstant(2d) && (i + 2) < list.Count)
+                {
                     var codeAfterNext = list[i + 2];
-                    if (codeAfterNext.Calls(drawLine)) {
+                    if (codeAfterNext.Calls(drawLine))
+                    {
                         code.operand = 3f;
                         lineWidthFixed = true;
                         yield return code;
@@ -57,21 +61,19 @@ namespace EasySpeedup
                     }
                 }
 
-                // find opcode where they check if DevMode is enabled, and replace it with a True
-                if (!devModeEnabled && code.Calls(devGetter)) {
-                    CodeInstruction code = list[i];
+                if (!devModeEnabled && code.Calls(devGetter))
+                {
                     code.opcode = OpCodes.Ldc_I4_1;
+                    code.operand = null;
                     devModeEnabled = true;
                     yield return code;
                     continue;
                 }
 
-                // yield latest codeinstruction
                 yield return code;
             }
         }
 
-        // add room to the time rectangle for 5th speed button
         public static void Prefix(ref Rect timerRect)
         {
             timerRect.x -= 35f;
