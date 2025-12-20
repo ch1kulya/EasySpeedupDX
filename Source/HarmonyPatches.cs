@@ -26,6 +26,7 @@ namespace EasySpeedup
     {
         private static readonly MethodInfo devGetter = AccessTools.Property(typeof(Prefs), nameof(Prefs.DevMode)).GetGetMethod();
         private static readonly MethodInfo drawLine = AccessTools.Method(typeof(Widgets), nameof(Widgets.DrawLineHorizontal), new System.Type[] { typeof(float), typeof(float), typeof(float) });
+        private static readonly FieldInfo timeSpeedFaster = AccessTools.Field(typeof(KeyBindingDefOf), nameof(KeyBindingDefOf.TimeSpeed_Faster));
 
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
@@ -33,6 +34,7 @@ namespace EasySpeedup
             var buttonDrawn = false;
             var lineWidthFixed = false;
             var devModeEnabled = false;
+            var inFasterBlock = false;
 
             for (var i = 0; i < list.Count; i++)
             {
@@ -68,6 +70,17 @@ namespace EasySpeedup
                     devModeEnabled = true;
                     yield return code;
                     continue;
+                }
+
+                if (!inFasterBlock && code.LoadsField(timeSpeedFaster))
+                {
+                    inFasterBlock = true;
+                }
+
+                if (inFasterBlock && code.opcode == OpCodes.Ldc_I4_3)
+                {
+                    code.opcode = OpCodes.Ldc_I4_4;
+                    inFasterBlock = false;
                 }
 
                 yield return code;
